@@ -10,6 +10,41 @@ let app = express();
 
 app.get('/producto', (req, res)=>{
 
+    let desde = req.query.desde || 0;    //ver
+    desde = Number(desde);
+
+    let limite = req.query.limite || 0;  //ver
+    limite = Number(limite);
+
+    Producto.find({})
+    .sort('nombre')
+    .populate('categoria', 'descripcion')
+    .populate('usuario', 'nombre email')
+    .skip(desde)
+    .limit(limite)
+    .exec((err, productos)=>{
+
+        if(err){
+            return res.status(500).json({
+                ok:false,
+                err
+            });
+        }
+
+        if(!productos){
+            return res.status(400).json({
+                ok:false,
+                err
+            });
+        }
+
+        res.json({
+            ok:true,
+            producto: productos
+        });
+
+    })
+
 });
 
 //===========================
@@ -53,7 +88,7 @@ app.post('/producto', (req, res)=>{
         if(!productoDB){
             return res.status(400).json({
                 ok:false,
-                message:'No se guardo correctamente'
+                err
             });
         }
 
@@ -72,6 +107,32 @@ app.post('/producto', (req, res)=>{
 
 app.put('/producto/:id', (req, res)=>{
 
+    let id = req.params.id;
+    let body = req.body;
+
+    Producto.findByIdAndUpdate(id, body, { new: true, runValidators: true} , (err, productoDB)=>{
+
+        if(err){
+            return res.status(500).json({
+                ok:false,
+                err
+            });
+        }
+
+        if(!productoDB){
+            return res.status(400).json({
+                ok:false,
+                err
+            });
+        }
+
+        res.json({
+            ok:true,
+            producto:productoDB
+        });
+
+    })
+
 });
 
 //===========================
@@ -79,6 +140,32 @@ app.put('/producto/:id', (req, res)=>{
 //===========================
 
 app.delete('/producto/:id', (req, res)=>{
+
+    let id = req.params.id;
+    let body = req.body;
+
+    Producto.findByIdAndUpdate(id, body, {new:true, runValidators:true}, (err, productoModif)=>{
+
+        if(err){
+            return res.status(500).json({
+                ok:false,
+                err
+            });
+        }
+
+        if(!productoModif){
+            return res.status(400).json({
+                ok:false,
+                err
+            });
+        }
+
+        res.json({
+            ok:true,
+            producto:productoModif
+        });
+
+    })
 
 });
 
