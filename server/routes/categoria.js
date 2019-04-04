@@ -10,9 +10,12 @@ const Categoria = require('../models/categoria');
 //Mostrar categorias
 //===============================
 
-app.get('/categoria', (req, res)=>{
+app.get('/categoria',verificaToken, (req, res)=>{
 
-    Categoria.find({}, (err, categoriaDB)=>{
+    Categoria.find({})
+        .sort('descripcion')
+        .populate('usuario', 'nombre email')
+        .exec((err, categoriaDB)=>{
 
         if(err){
             return res.status(500).json({
@@ -38,10 +41,10 @@ app.get('/categoria', (req, res)=>{
 });
 
 //===============================
-//Mostrar categorias
+//Mostrar categoria especifica por id
 //===============================
 
-app.get('/categoria/:id',(req, res)=>{
+app.get('/categoria/:id',verificaToken, (req, res)=>{
     let id = req.params.id;
 
     Categoria.findById(id, (err, categoriaDB)=>{
